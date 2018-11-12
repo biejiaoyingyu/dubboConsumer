@@ -1,0 +1,30 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	  http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	  http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<!-- 提供方应用信息 -->
+	<dubbo:application name="dubboConsumer" />
+	<!--注册中心是zookeeper -->
+	<dubbo:registry address="zookeeper://192.168.1.179:2181"	client="zkclient" />
+	<!-- 从注册中心中查找服务 -->
+	<dubbo:reference id="bikeService" group="one"	interface="com.cxf.dubbo.service.BikeService"  />
+
+	<dubbo:reference id="callbackService" interface="com.cxf.dubbo.service.CallbackService" />
+
+	<bean id="notifyImpl" class="entities.NotifyImpl"  />
+
+	<dubbo:reference id = "onCallback" interface="com.cxf.dubbo.service.BookService" group="one" >
+		<dubbo:method name="getOneBook4Callback" async="false" onreturn="notifyImpl.onreturn" onthrow="notifyImpl.onthrow" />
+	</dubbo:reference>
+
+	<dubbo:reference id="userService" interface="com.cxf.dubbo.service.UserService" stub="clintimpl.UserServiceStub" protocol="dubbo"/>
+
+	<!--<dubbo:reference  id ="phoneService" interface="com.cxf.dubbo.service.PhoneService"  mock="clintimpl.PhoneServiceMock" check="true" />-->
+
+</beans>
+ 
